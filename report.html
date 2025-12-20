@@ -1,0 +1,180 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Relatório K6</title></head><body>
+<h1>Relatório K6 - Execução</h1>
+<ul>
+  <li><strong>Checks total:</strong> 0</li>
+  <li><strong>Checks aprovados:</strong> 172</li>
+  <li><strong>Checks falhados:</strong> -172</li>
+  <li><strong>http_req_duration p(95):</strong> 549.57882 ms</li>
+</ul>
+<h2>Raw JSON</h2>
+<pre style="max-height:400px;overflow:auto">{
+  "metrics": {
+    "iterations": {
+      "count": 416,
+      "rate": 27.22456448370096
+    },
+    "http_req_duration{expected_response:true}": {
+      "p(95)": 811.180755,
+      "avg": 448.31362616279057,
+      "min": 7.586,
+      "med": 437.63855,
+      "max": 913.8295,
+      "p(90)": 783.40532
+    },
+    "data_received": {
+      "count": 160601,
+      "rate": 10510.317982324177
+    },
+    "vus_max": {
+      "value": 10,
+      "min": 10,
+      "max": 10
+    },
+    "http_req_sending": {
+      "med": 0,
+      "max": 1.2364,
+      "p(90)": 0,
+      "p(95)": 0,
+      "avg": 0.007745072115384614,
+      "min": 0
+    },
+    "http_req_receiving": {
+      "avg": 0.16141899038461538,
+      "min": 0,
+      "med": 0,
+      "max": 1.1544,
+      "p(90)": 0.68695,
+      "p(95)": 0.8603699999999996
+    },
+    "http_req_blocked": {
+      "max": 2.0004,
+      "p(90)": 0,
+      "p(95)": 0,
+      "avg": 0.011582692307692304,
+      "min": 0,
+      "med": 0
+    },
+    "checkout_duration": {
+      "max": 565.4389,
+      "p(90)": 425.5903,
+      "p(95)": 448.969075,
+      "avg": 123.2368146634615,
+      "min": 0,
+      "med": 0
+    },
+    "http_req_waiting": {
+      "med": 0,
+      "max": 912.9459,
+      "p(90)": 454.83218,
+      "p(95)": 549.12898,
+      "avg": 151.15407055288455,
+      "min": 0
+    },
+    "http_req_connecting": {
+      "avg": 0.006783052884615384,
+      "min": 0,
+      "med": 0,
+      "max": 0.9993,
+      "p(90)": 0,
+      "p(95)": 0
+    },
+    "http_reqs": {
+      "count": 832,
+      "rate": 54.44912896740192
+    },
+    "http_req_duration": {
+      "max": 913.8295,
+      "p(90)": 455.62008999999995,
+      "p(95)": 549.57882,
+      "avg": 151.32323461538456,
+      "min": 0,
+      "med": 0,
+      "thresholds": {
+        "p(95)<2000": false
+      }
+    },
+    "data_sent": {
+      "count": 103045,
+      "rate": 6743.642421209051
+    },
+    "group_duration": {
+      "max": 913.8295,
+      "p(90)": 455.62008999999995,
+      "p(95)": 549.57882,
+      "avg": 152.92913173076917,
+      "min": 0.9975,
+      "med": 3.001
+    },
+    "http_req_failed": {
+      "passes": 660,
+      "fails": 172,
+      "value": 0.7932692307692307
+    },
+    "http_req_tls_handshaking": {
+      "avg": 0,
+      "min": 0,
+      "med": 0,
+      "max": 0,
+      "p(90)": 0,
+      "p(95)": 0
+    },
+    "iteration_duration": {
+      "min": 2.9973,
+      "med": 6.00085,
+      "max": 1407.8964,
+      "p(90)": 875.3195000000001,
+      "p(95)": 1054.25955,
+      "avg": 305.90419831730765
+    },
+    "checks": {
+      "passes": 172,
+      "fails": 660,
+      "value": 0.20673076923076922
+    },
+    "vus": {
+      "value": 10,
+      "min": 2,
+      "max": 10
+    }
+  },
+  "root_group": {
+    "checks": {},
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": {
+      "Login User": {
+        "id": "dcbf6da3bcc518ef5bb81b79d82cb2ec",
+        "groups": {},
+        "checks": {
+          "login status is 200": {
+            "passes": 156,
+            "fails": 260,
+            "name": "login status is 200",
+            "path": "::Login User::login status is 200",
+            "id": "82adf46efae2b4eafbf9759fd60331a6"
+          }
+        },
+        "name": "Login User",
+        "path": "::Login User"
+      },
+      "Checkout Flow": {
+        "checks": {
+          "checkout status is 200": {
+            "passes": 16,
+            "fails": 400,
+            "name": "checkout status is 200",
+            "path": "::Checkout Flow::checkout status is 200",
+            "id": "24f99b730f5f15df3fd4b79d3f9c0f8f"
+          }
+        },
+        "name": "Checkout Flow",
+        "path": "::Checkout Flow",
+        "id": "72b9bce5cfae5a975ee16af4e2346dc3",
+        "groups": {}
+      }
+    }
+  }
+}</pre>
+</body></html>

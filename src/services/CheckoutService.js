@@ -28,7 +28,7 @@ class CheckoutService {
   }
 
   // Process checkout
-  static processCheckout(userId, items, paymentMethod) {
+  static processCheckout(userId, items, paymentMethod, simulate = false) {
     // Validate payment method
     if (!this.validatePaymentMethod(paymentMethod)) {
       throw new Error('Invalid payment method. Only cash or credit_card accepted');
@@ -52,8 +52,10 @@ class CheckoutService {
         total: itemTotal
       });
 
-      // Update stock (simulate purchase)
-      product.stock -= item.quantity;
+      // Update stock (simulate purchase) unless simulate flag set
+      if (!simulate) {
+        product.stock -= item.quantity;
+      }
     }
 
     // Calculate discount

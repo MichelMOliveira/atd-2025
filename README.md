@@ -420,14 +420,28 @@ src/
 
 ## Technologies Used
 
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **JWT** - Authentication tokens
-- **bcryptjs** - Password hashing
-- **Swagger UI** - API documentation
-- **CORS** - Cross-origin resource sharing
-- **YAML** - Swagger specification
 
 ## License
 
 ISC License
+
+## Testes de Performance (K6)
+
+O código abaixo está armazenado no arquivo test/k6/checkout.test.js e demontra o uso do conceito de Groups e dentro dele faço uso de um Helper, uma função de login, que foi importada de um outro script javascript.
+
+group('Login User', function () {
+  token = login(email, password);
+});
+
+Para rodar localmente (requer k6 instalado):
+
+```bash
+# executar aplicação
+npm run dev
+
+# executar teste k6 (gera report.json)
+k6 run --out json=report.json test/k6/checkout.test.js
+
+# gerar relatório HTML (com k6-to-html disponível via npm ou npx)
+npx k6-to-html report.json -o report.html
+```

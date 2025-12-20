@@ -39,7 +39,8 @@ class CheckoutController {
         }
       }
 
-      const order = CheckoutService.processCheckout(userId, items, paymentMethod);
+      const simulate = req.headers['x-simulate'] === 'true' || false;
+      const order = CheckoutService.processCheckout(userId, items, paymentMethod, simulate);
 
       res.json({
         success: true,
