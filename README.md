@@ -427,11 +427,193 @@ ISC License
 
 ## Testes de Performance (K6)
 
-O código abaixo está armazenado no arquivo test/k6/checkout.test.js e demontra o uso do conceito de Groups e dentro dele faço uso de um Helper, uma função de login, que foi importada de um outro script javascript.
+### Conceitos Utilizados no Projeto
 
-group('Login User', function () {
-  token = login(email, password);
+#### 1. **Groups**
+O código abaixo está armazenado no arquivo `test/k6/checkout.test.js` e demonstra o uso do conceito de Groups, que agrupa testes relacionados:
+
+```javascript
+group('Checkout Flow', function () {
+  const payloadBase = checkoutData[__ITER % checkoutData.length];
+  const payload = Object.assign({}, payloadBase, { clientRef: fakeEmail('client') });
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  };
+  const res = http.post(`${baseUrl}/checkout`, JSON.stringify(payload), params);
 });
+```
+
+#### 2. **Helpers**
+As funções auxiliares estão definidas no arquivo `test/k6/helpers.js` e são importadas e reutilizadas no teste:
+
+```javascript
+import { login, fakeEmail } from './helpers.js';
+
+// Usando helper de login
+export function setup() {
+  const result = login(baseUrl, email, password, 5, 1);
+  const token = result.token;
+  return { token };
+}
+
+// Usando helper de fake email
+const payload = Object.assign({}, payloadBase, { clientRef: fakeEmail('client') });
+```
+
+A função `login` é definida em `test/k6/helpers.js`:
+```javascript
+export function login(baseUrl, email, password, attempts = 5, waitSec = 1) {
+  const url = `${baseUrl}/auth/login`;
+  const payload = JSON.stringify({ email, password });
+  const params = { headers: { 'Content-Type': 'application/json' } };
+  // ... implementação com retries
+}
+```
+
+#### 3. **Variáveis de Ambiente**
+Variáveis de ambiente são utilizadas para configurar a base URL e credenciais de login em `test/k6/checkout.test.js`:
+
+```javascript
+const baseUrl = __ENV.BASE_URL || 'http://localhost:3000';
+const email = __ENV.LOGIN_EMAIL || 'john@example.com';
+const password = __ENV.LOGIN_PASS || 'password123';
+```
+
+#### 4. **Thresholds**
+Limites de desempenho estão definidos no arquivo `test/k6/checkout.test.js`, estabelecendo que 95% das requisições devem ser respondidas em menos de 2 segundos:
+
+```javascript
+export const options = {
+  vus: 10,
+  duration: '15s',
+  thresholds: {
+    'http_req_duration': ['p(95)<2000']
+  }
+};
+```
+
+#### 5. **Checks**
+Verificações são feitas para validar as respostas das requisições em `test/k6/checkout.test.js` e em `test/k6/helpers.js`:
+
+```javascript
+// No checkout.test.js
+check(h, { 'health is 200': r => r.status === 200 });
+
+check(res, {
+  'checkout status is 200': r => r.status === 200
+});
+
+// No helpers.js - dentro da função login
+check(res, { 'login status is 200': r => r.status === 200 });
+```
+
+#### 6. **Trends**
+Métrica de tendência para rastrear a duração das requisições de checkout em `test/k6/checkout.test.js`:
+
+```javascript
+import { Trend } from 'k6/metrics';
+
+const checkoutTrend = new Trend('checkout_duration');
+
+// Dentro do grupo de checkout
+checkoutTrend.add(res.timings ? res.timings.duration : 0);
+```
+
+#### 7. **Faker**
+Dados aleatórios são gerados usando a função `fakeEmail` em `test/k6/helpers.js`:
+
+```javascript
+export function fakeEmail(name = 'user') {
+  return `${name}.${Math.floor(Math.random() * 10000)}@example.com`;
+}
+
+// Usado em test/k6/checkout.test.js
+const payload = Object.assign({}, payloadBase, { clientRef: fakeEmail('client') });
+```
+
+#### 8. **Data-Driven Testing**
+Os dados de teste são carregados de um arquivo JSON externo em `test/k6/checkout.test.js`:
+
+```javascript
+import { SharedArray } from 'k6/data';
+
+const checkoutData = new SharedArray('checkoutData', function() {
+  return JSON.parse(open('./data/checkoutData.json'));
+});
+
+// Dentro do default function
+const payloadBase = checkoutData[__ITER % checkoutData.length];
+```
+
+Arquivo `test/k6/data/checkoutData.json` contém os cenários de teste:
+```json
+[
+  {
+    "items": [
+      { "productId": 1, "quantity": 1 },
+      { "productId": 2, "quantity": 2 }
+    ],
+    "paymentMethod": "credit_card"
+  },
+  {
+    "items": [
+      { "productId": 3, "quantity": 1 }
+    ],
+    "paymentMethod": "cash"
+  }
+]
+```
+
+#### 9. **Uso de Token de Autenticação**
+O token JWT é obtido no setup e reutilizado em todas as requisições de checkout em `test/k6/checkout.test.js`:
+
+```javascript
+export function setup() {
+  const result = login(baseUrl, email, password, 5, 1);
+  const token = result.token;
+  return { token };
+}
+
+export default function (data) {
+  const token = data.token;
+  
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  };
+  
+  const res = http.post(`${baseUrl}/checkout`, JSON.stringify(payload), params);
+}
+```
+
+#### 10. **Reaproveitamento de Resposta**
+O token obtido na função `setup()` é reutilizado em todas as iterações da função `default` em `test/k6/checkout.test.js`:
+
+```javascript
+export function setup() {
+  const result = login(baseUrl, email, password, 5, 1);
+  const token = result.token;
+  
+  // Health check para validar servidor
+  const h = http.get(`${baseUrl}/health`);
+  check(h, { 'health is 200': r => r.status === 200 });
+  
+  // Retorna token para ser usado em todas as VUs
+  return { token };
+}
+
+export default function (data) {
+  const token = data.token; // Reaproveitamento do token do setup
+  // ... resto do teste
+}
+```
+
+### Como Executar os Testes
 
 Para rodar localmente (requer k6 instalado):
 
